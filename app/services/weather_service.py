@@ -23,7 +23,13 @@ class WeatherResult:
 
 
 class WeatherService:
-    def __init__(self, *, cache: AsyncCache, provider: WeatherProvider, ttl_seconds: float = 300.0) -> None:
+    def __init__(
+        self,
+        *,
+        cache: AsyncCache,
+        provider: WeatherProvider,
+        ttl_seconds: float = 300.0,
+    ) -> None:
         self._cache = cache
         self._provider = provider
         self._ttl_seconds = ttl_seconds
@@ -52,7 +58,9 @@ class WeatherService:
             try:
                 cached_data = json.loads(cached_raw)
                 if isinstance(cached_data, dict):
-                    return WeatherResult(city=city_norm, data=cached_data, cache_hit=True)
+                    return WeatherResult(
+                        city=city_norm, data=cached_data, cache_hit=True
+                    )
             except Exception:
                 # Cache contains invalid JSON → treat as miss
                 logger.exception("cache_decode_failed key=%s", key)

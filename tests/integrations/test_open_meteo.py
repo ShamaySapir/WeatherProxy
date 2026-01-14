@@ -181,7 +181,8 @@ async def test_fetch_weather_4xx_no_retry(client: OpenMeteoClient) -> None:
 async def test_fetch_weather_forecast_4xx_no_retry(
     client: OpenMeteoClient,
 ) -> None:
-    """Test that 4xx errors in forecast are not retried and 502 is returned to client."""
+    """Test that 4xx errors in forecast are not retried and
+    502 is returned to client."""
     with respx.mock:
         # Mock successful geocoding
         respx.get("https://api.open-meteo.com/v1/geocoding").mock(

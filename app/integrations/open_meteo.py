@@ -8,7 +8,13 @@ from dataclasses import dataclass
 from typing import Any, Awaitable, Callable, TypeVar
 
 import httpx
-from tenacity import RetryError, retry, retry_if_exception, stop_after_attempt, wait_exponential
+from tenacity import (
+    RetryError,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from app.core.config import get_settings
 from app.core.errors import (
@@ -38,6 +44,7 @@ def _unwrap_retry_error(exc: BaseException) -> BaseException:
         return inner if inner is not None else exc
     return exc
 
+
 @dataclass
 class AsyncCircuitBreaker:
     """
@@ -47,6 +54,7 @@ class AsyncCircuitBreaker:
     - While open, rejects calls for `reset_timeout` seconds.
     - After timeout, allows calls again; a success closes it, a failure opens it.
     """
+
     fail_max: int
     reset_timeout: float  # seconds
 
@@ -67,7 +75,9 @@ class AsyncCircuitBreaker:
         if self.failure_count >= self.fail_max:
             self.opened_at = time.monotonic()
 
-    async def call(self, func: Callable[..., Awaitable[T]], *args: Any, **kwargs: Any) -> T:
+    async def call(
+        self, func: Callable[..., Awaitable[T]], *args: Any, **kwargs: Any
+    ) -> T:
         if self._is_open():
             raise CircuitBreakerOpenError("Upstream service unavailable (circuit open)")
 
@@ -160,7 +170,9 @@ class OpenMeteoClient:
             raise
 
         except httpx.RequestError as e:
-            logger.error("geocoding_request_error", extra={"request_id": "-", "city": city})
+            logger.error(
+                "geocoding_request_error", extra={"request_id": "-", "city": city}
+            )
             raise UpstreamError("Upstream geocoding service error") from e
 
     @retry(

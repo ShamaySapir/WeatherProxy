@@ -6,7 +6,12 @@ from app.services import WeatherService
 
 
 class FakeAsyncCache:
-    def __init__(self, initial: dict[str, str] | None = None, fail_get: bool = False, fail_set: bool = False):
+    def __init__(
+        self,
+        initial: dict[str, str] | None = None,
+        fail_get: bool = False,
+        fail_set: bool = False,
+    ):
         self.store = dict(initial or {})
         self.fail_get = fail_get
         self.fail_set = fail_set

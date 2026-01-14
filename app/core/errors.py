@@ -61,7 +61,6 @@ class UpstreamError(AppError):
         super().__init__(message, details=details)
 
 
-
 class UpstreamTimeoutError(UpstreamError):
     """Upstream service timeout."""
 

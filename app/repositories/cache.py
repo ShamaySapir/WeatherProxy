@@ -4,9 +4,11 @@ from __future__ import annotations
 import time
 from typing_extensions import Protocol
 
+
 class AsyncCache(Protocol):
     async def get(self, key: str) -> str | None: ...
     async def set(self, key: str, value: str, ttl: float) -> None: ...
+
 
 class AsyncCacheRepository:
     """In-memory cache with TTL support.

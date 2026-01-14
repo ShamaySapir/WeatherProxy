@@ -36,12 +36,16 @@ def _override_weather_service() -> None:
 
 
 @pytest.mark.asyncio
-async def test_weather_cache_behavior_respx_mocks_open_meteo_calls(asgi_client: httpx.AsyncClient) -> None:
+async def test_weather_cache_behavior_respx_mocks_open_meteo_calls(
+    asgi_client: httpx.AsyncClient,
+) -> None:
     _override_weather_service()
 
     async with asgi_client as client:
         with respx.mock(assert_all_called=True) as rsps:
-            geocoding_route = rsps.get("https://geocoding-api.open-meteo.com/v1/search").respond(
+            geocoding_route = rsps.get(
+                "https://geocoding-api.open-meteo.com/v1/search"
+            ).respond(
                 200,
                 json={"results": [{"latitude": 32.0625, "longitude": 34.8125}]},
             )
@@ -82,7 +86,9 @@ async def test_weather_cache_behavior_respx_mocks_open_meteo_calls(asgi_client: 
 
 
 @pytest.mark.asyncio
-async def test_weather_missing_city_param_returns_validation_error(asgi_client: httpx.AsyncClient) -> None:
+async def test_weather_missing_city_param_returns_validation_error(
+    asgi_client: httpx.AsyncClient,
+) -> None:
     async with asgi_client as client:
         r = await client.get("/weather")
 
@@ -99,12 +105,16 @@ async def test_weather_missing_city_param_returns_validation_error(asgi_client: 
 
 
 @pytest.mark.asyncio
-async def test_weather_city_not_found_returns_error_envelope(asgi_client: httpx.AsyncClient) -> None:
+async def test_weather_city_not_found_returns_error_envelope(
+    asgi_client: httpx.AsyncClient,
+) -> None:
     _override_weather_service()
 
     async with asgi_client as client:
         with respx.mock(assert_all_called=True) as rsps:
-            rsps.get("https://geocoding-api.open-meteo.com/v1/search").respond(200, json={"results": []})
+            rsps.get("https://geocoding-api.open-meteo.com/v1/search").respond(
+                200, json={"results": []}
+            )
 
             r = await client.get("/weather", params={"city": "NoSuchCity"})
             assert r.status_code == 404
@@ -117,10 +127,13 @@ async def test_weather_city_not_found_returns_error_envelope(asgi_client: httpx.
 
 
 @pytest.mark.asyncio
-async def test_weather_upstream_error_returns_error_envelope(asgi_client: httpx.AsyncClient) -> None:
+async def test_weather_upstream_error_returns_error_envelope(
+    asgi_client: httpx.AsyncClient,
+) -> None:
     """
     Use a forecast 4xx scenario to avoid retries/backoff sleeps.
-    In OpenMeteoClient._fetch_forecast, 4xx raises UpstreamError(retryable=False, status_code=502).
+    In OpenMeteoClient._fetch_forecast, 4xx raises UpstreamError(retryable=False,
+    status_code=502).
     """
     _override_weather_service()
 
