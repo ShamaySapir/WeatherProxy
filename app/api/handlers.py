@@ -8,10 +8,12 @@ from typing import Any
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.responses import Response
-
 from app.core.errors import AppError
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 logger = logging.getLogger(__name__)
+
 
 
 def _get_request_id(request: Request) -> str:
@@ -35,6 +37,68 @@ def get_error_response(
             "request_id": request_id,
         }
     }
+
+
+async def request_validation_error_handler(
+    request: Request, exc: Exception
+) -> Response:
+    """Handle FastAPI request validation errors (e.g., wrong query param type)."""
+    request_id = _get_request_id(request)
+
+    if not isinstance(exc, RequestValidationError):
+        raise exc
+
+    logger.warning(
+        "request_validation_error path=%s",
+        request.url.path,
+        extra={"request_id": request_id, "path": request.url.path},
+    )
+
+    # Optional: include exc.errors() in logs only, not in response (safer)
+    logger.debug(
+        "request_validation_details errors=%s",
+        exc.errors(),
+        extra={"request_id": request_id},
+    )
+
+    error_response = get_error_response(
+        message="Invalid request.",
+        code="validation_error",
+        status_code=400,
+        request_id=request_id,
+    )
+    return JSONResponse(status_code=400, content=error_response)
+
+
+async def http_exception_handler(
+    request: Request, exc: Exception
+) -> Response:
+    """Handle Starlette/FastAPI HTTPException errors (mostly 4xx)."""
+    request_id = _get_request_id(request)
+
+    if not isinstance(exc, StarletteHTTPException):
+        raise exc
+
+    # For 4xx this is expected, log as info/warning (not error)
+    logger.info(
+        "http_exception status_code=%s path=%s",
+        exc.status_code,
+        request.url.path,
+        extra={
+            "request_id": request_id,
+            "status_code": exc.status_code,
+            "path": request.url.path,
+        },
+    )
+
+    error_response = get_error_response(
+        message=str(exc.detail),
+        code="client_error",
+        status_code=exc.status_code,
+        request_id=request_id,
+    )
+    return JSONResponse(status_code=exc.status_code, content=error_response)
+
 
 
 async def app_error_handler(request: Request, exc: Exception) -> Response:
@@ -90,3 +154,5 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> Respo
         request_id=request_id,
     )
     return JSONResponse(status_code=500, content=error_response)
+
+
