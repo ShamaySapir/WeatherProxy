@@ -18,8 +18,7 @@ jobs:
 
       - name: Install deps
         run: |
-            pip install uv
-            uv install --dev
+            uv sync
 
       - name: Ruff format check
         run: ruff format --check
