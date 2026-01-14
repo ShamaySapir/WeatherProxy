@@ -62,6 +62,7 @@ app/
   main.py              # FastAPI application
   api/                 # API routes and dependencies
   core/                # Configuration, logging, error handling
+  integrations/        # External service integrations  
   services/            # Business logic
   repositories/        # Data access layer
 
@@ -76,11 +77,7 @@ README.md              # This file
 ## API Endpoints
 
 - `GET /health` – Health check
-- `GET /weather?city=<city>` – Get weather for a city (coming in Block 8)
-
-## Design Decisions
-
-See `docs/adr/0001-architecture.md` for detailed architecture decisions.
+- `GET /weather?city=<city>` – Get weather for a city
 
 ## Development
 
