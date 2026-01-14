@@ -20,7 +20,8 @@ from app.core.errors import (
 
 logger = logging.getLogger(__name__)
 
-OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1"
+OPEN_METEO_FORECAST_BASE_URL = "https://api.open-meteo.com/v1"
+OPEN_METEO_GEOCODING_BASE_URL = "https://geocoding-api.open-meteo.com/v1/search"
 
 T = TypeVar("T")
 
@@ -108,7 +109,7 @@ class OpenMeteoClient:
         wait=wait_exponential(multiplier=1, min=1, max=10),
     )
     async def _fetch_geocoding(self, city: str) -> tuple[float, float]:
-        url = f"{OPEN_METEO_BASE_URL}/geocoding"
+        url = f"{OPEN_METEO_GEOCODING_BASE_URL}"
         params = {"name": city, "count": 1, "language": "en", "format": "json"}
 
         try:
@@ -168,7 +169,7 @@ class OpenMeteoClient:
         wait=wait_exponential(multiplier=1, min=1, max=10),
     )
     async def _fetch_forecast(self, lat: float, lon: float) -> dict[str, Any]:
-        url = f"{OPEN_METEO_BASE_URL}/forecast"
+        url = f"{OPEN_METEO_FORECAST_BASE_URL}/forecast"
         params = {
             "latitude": lat,
             "longitude": lon,
