@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 import logging
 from fastapi import FastAPI
-from app.api import RequestIDMiddleware
-from app.core import get_settings
+from app.api import RequestIDMiddleware, app_error_handler, unhandled_exception_handler
+from app.core import AppError, get_settings
 from app.core.logging import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Weather Proxy", lifespan=lifespan)
 app.add_middleware(RequestIDMiddleware)
+
+# Register exception handlers
+
+app.add_exception_handler(AppError, app_error_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 
 @app.get("/health")
