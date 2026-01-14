@@ -7,11 +7,13 @@ from app.api import (
     http_exception_handler,
     unhandled_exception_handler,
     request_validation_error_handler,
+    weather_router,
 )
 from app.core import AppError, get_settings
 from app.core.logging import setup_logging
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +33,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Weather Proxy", lifespan=lifespan)
 app.add_middleware(RequestIDMiddleware)
+app.include_router(weather_router)
 
 # Register exception handlers
 
