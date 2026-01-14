@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          pip install -U pip
+          pip install ruff pytest pytest-cov
+          pip install .
+
+      - name: Ruff format check
+        run: ruff format --check
+
+      - name: Ruff lint
+        run: ruff check
+
+      - name: Pytest with coverage
+        run: |
+          pytest \
+            --cov=app \
+            --cov-report=term-missing \
+            --cov-fail-under=85
+
+      - name: Build Docker image
+        run: docker build -t weather-proxy:ci .
