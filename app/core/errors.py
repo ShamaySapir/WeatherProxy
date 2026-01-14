@@ -44,8 +44,6 @@ class NotFoundError(AppError):
 
 
 class UpstreamError(AppError):
-    """Error from upstream service."""
-
     code = "upstream_error"
     status_code = 502
 
@@ -55,11 +53,13 @@ class UpstreamError(AppError):
         *,
         status_code: int | None = None,
         details: dict[str, Any] | None = None,
+        retryable: bool = True,
     ) -> None:
-        # allow overriding status_code for specific upstream failures
+        self.retryable = retryable
         if status_code is not None:
             self.status_code = status_code
         super().__init__(message, details=details)
+
 
 
 class UpstreamTimeoutError(UpstreamError):
@@ -73,7 +73,7 @@ class UpstreamTimeoutError(UpstreamError):
         *,
         details: dict[str, Any] | None = None,
     ) -> None:
-        super().__init__(message, details=details)
+        super().__init__(message, details=details, retryable=True)
 
 
 class CircuitBreakerOpenError(AppError):
