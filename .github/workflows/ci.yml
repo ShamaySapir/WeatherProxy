@@ -18,9 +18,8 @@ jobs:
 
       - name: Install deps
         run: |
-          pip install -U pip
-          pip install ruff pytest pytest-cov
-          pip install .
+            pip install uv
+            uv install --dev
 
       - name: Ruff format check
         run: ruff format --check
