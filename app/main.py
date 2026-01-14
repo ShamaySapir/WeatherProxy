@@ -1,20 +1,28 @@
 from contextlib import asynccontextmanager
-
+import logging
 from fastapi import FastAPI
-
+from app.api import RequestIDMiddleware
 from app.core import get_settings
+from app.core.logging import setup_logging
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load settings on app startup."""
+    """Load settings and setup logging on app startup."""
     settings = get_settings()
-    # Settings are now initialized and accessible globally
-    print(f"App started in {settings.environment} mode")
+    setup_logging(settings.log_level)
+    app.state.settings = settings
+    logger.info(
+        "app_started environment=%s",
+        settings.environment,
+    )
     yield
 
 
 app = FastAPI(title="Weather Proxy", lifespan=lifespan)
+app.add_middleware(RequestIDMiddleware)
 
 
 @app.get("/health")
