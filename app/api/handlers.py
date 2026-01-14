@@ -15,7 +15,6 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 logger = logging.getLogger(__name__)
 
 
-
 def _get_request_id(request: Request) -> str:
     # request_id is set by middleware; fallback to "-"
     return getattr(request.state, "request_id", "-")
@@ -70,9 +69,7 @@ async def request_validation_error_handler(
     return JSONResponse(status_code=400, content=error_response)
 
 
-async def http_exception_handler(
-    request: Request, exc: Exception
-) -> Response:
+async def http_exception_handler(request: Request, exc: Exception) -> Response:
     """Handle Starlette/FastAPI HTTPException errors (mostly 4xx)."""
     request_id = _get_request_id(request)
 
@@ -98,7 +95,6 @@ async def http_exception_handler(
         request_id=request_id,
     )
     return JSONResponse(status_code=exc.status_code, content=error_response)
-
 
 
 async def app_error_handler(request: Request, exc: Exception) -> Response:
@@ -154,5 +150,3 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> Respo
         request_id=request_id,
     )
     return JSONResponse(status_code=500, content=error_response)
-
-

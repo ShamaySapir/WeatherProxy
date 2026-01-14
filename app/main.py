@@ -1,8 +1,13 @@
 from contextlib import asynccontextmanager
 import logging
 from fastapi import FastAPI
-from app.api import ( RequestIDMiddleware, app_error_handler, http_exception_handler,
-                     unhandled_exception_handler, request_validation_error_handler)
+from app.api import (
+    RequestIDMiddleware,
+    app_error_handler,
+    http_exception_handler,
+    unhandled_exception_handler,
+    request_validation_error_handler,
+)
 from app.core import AppError, get_settings
 from app.core.logging import setup_logging
 from fastapi.exceptions import RequestValidationError
