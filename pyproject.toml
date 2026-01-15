@@ -13,6 +13,7 @@ dependencies = [
     "httpx",
     "pydantic-settings>=2.0.0",
     "tenacity>=8.2.0",
+    "ruff>=0.1.0",
 ]
 
 [project.optional-dependencies]
